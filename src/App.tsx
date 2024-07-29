@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StartScreen from './components/StartScreen';
 import Question from './components/Question';
 import Result from './components/Result';
 import './App.css';
+import Loader from './components/Loader';
 
 interface Question {
   category: string;
@@ -21,20 +22,6 @@ const App: React.FC = () => {
   const [isAnswered, setIsAnswered] = useState<boolean>(false);
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [correctAnswer, setCorrectAnswer] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState<number>(30);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
-
-  useEffect(() => {
-    if (timeLeft > 0 && !isAnswered) {
-      const timer = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
-      nextQuestion();
-    }
-  }, [timeLeft, isAnswered]);
 
   const fetchQuestions = async () => {
     const response = await fetch('https://opentdb.com/api.php?amount=10');
@@ -44,6 +31,7 @@ const App: React.FC = () => {
 
   const handleStart = (name: string) => {
     setUserName(name);
+    fetchQuestions();
   };
 
   const handleAnswer = (answer: string) => {
@@ -59,7 +47,6 @@ const App: React.FC = () => {
     setIsAnswered(false);
     setUserAnswer('');
     setCorrectAnswer('');
-    setTimeLeft(30);
   };
 
   const restartQuiz = () => {
@@ -70,29 +57,34 @@ const App: React.FC = () => {
     setIsAnswered(false);
     setUserAnswer('');
     setCorrectAnswer('');
-    setTimeLeft(30);
-    fetchQuestions();
   };
 
   if (!userName) {
     return <StartScreen onStart={handleStart} />;
   }
 
+  if (questions?.length === 0) {
+    return <Loader />
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
-      {questions?.length > 0 && currentQuestionIndex < 10 ? (
-        <Question
-          question={questions[currentQuestionIndex]}
-          handleAnswer={handleAnswer}
-          isAnswered={isAnswered}
-          userAnswer={userAnswer}
-          correctAnswer={correctAnswer}
-          nextQuestion={nextQuestion}
-        />
-      ) : (
-        <Result score={score} totalQuestions={10} restartQuiz={restartQuiz} />
-      )}
-    </div>
+    {currentQuestionIndex < questions?.length ? (
+      <Question
+        question={questions[currentQuestionIndex]}
+        handleAnswer={handleAnswer}
+        isAnswered={isAnswered}
+        userAnswer={userAnswer}
+        correctAnswer={correctAnswer}
+        nextQuestion={nextQuestion}
+      />
+    ) : (
+      questions?.length > 0 && (
+        <Result score={score} totalQuestions={questions.length} restartQuiz={restartQuiz} />
+      )
+    )}
+  </div>
+  
   );
 };
 
