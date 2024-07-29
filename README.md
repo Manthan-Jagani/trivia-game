@@ -1,3 +1,7 @@
+# Task Video
+
+https://github.com/user-attachments/assets/53244496-efa2-489e-95f4-575a2ac109fc
+
 # Trivia Game
 
 This is a simple trivia game built with React, TypeScript, and Tailwind CSS.
@@ -28,7 +32,7 @@ This is a simple trivia game built with React, TypeScript, and Tailwind CSS.
    npm start
 
 Running Tests
-This project uses Jest for testing. To run the tests, use the following command:
+    This project uses Jest for testing. To run the tests, use the following command:
 
-```bash
-npm test
+   ```bash
+   npm test
